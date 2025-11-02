@@ -1,5 +1,5 @@
 function ColorMyPencils(color)
-	color = color or "ashen"
+	color = color or "rose-pine"
 	vim.cmd.colorscheme(color)
 
 	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
@@ -31,16 +31,16 @@ return {
     },
 
     {
-		"ficcdaf/ashen.nvim",
+		"rose-pine/neovim",
 		lazy = false,
 		priority = 1000,
-        name = "ashen",
+        name = "rose-pine",
         config = function()
-            require('ashen').setup({
+            require('rose-pine').setup({
                 disable_background = true,
             })
 
-            vim.cmd("colorscheme ashen")
+            vim.cmd("colorscheme rose-pine")
 
             ColorMyPencils()
         end

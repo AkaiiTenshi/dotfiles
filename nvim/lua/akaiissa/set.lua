@@ -37,4 +37,11 @@ vim.g.c_formatter_42_format_on_save = 0
 vim.g.user42 = 'salsoysa'
 vim.g.mail42 = 'salsoysa@student.42.fr'
 
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "netrw",
+    callback = function()
+        vim.wo.number = true         -- absolute line numbers
+        vim.wo.relativenumber = true -- optional
+    end,
+})
 -- local augroup = vim.api.nvim_create_augroup
