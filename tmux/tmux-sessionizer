@@ -1,34 +1,40 @@
 #!/usr/bin/env bash
 
+# If one argument is passed, use it directly
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find ~/42-Code-Odyssey ~/Documents ~/ -mindepth 1 -maxdepth 3 -type d | fzf)
+    # Otherwise, find directories and pick one with fzf
+    selected=$(find ~/42-Code-Odyssey ~/Projects ~/Documents -mindepth 1 -maxdepth 3 -type d 2>/dev/null | fzf)
 fi
 
+# If nothing selected, exit quietly
 if [[ -z $selected ]]; then
     exit 0
 fi
 
-selected_name=$(basename "$selected" | tr . _)
+# Clean up the session name (no dots, no spaces)
+selected_name=$(basename "$selected" | tr . _ | tr -d ' ')
+
+# Check if tmux is running
 tmux_running=$(pgrep tmux)
 
+# If no tmux server is running at all
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    # Pas de tmux du tout, on crée et attache
-    tmux new-session -s $selected_name -c $selected
+    tmux new-session -s "$selected_name" -c "$selected"
     exit 0
 fi
 
-if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    # Crée en détaché si pas déjà existante
-    tmux new-session -ds $selected_name -c $selected
+# If the session doesn't already exist, create it detached
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+    tmux new-session -ds "$selected_name" -c "$selected"
 fi
 
+# If already inside tmux, switch client
 if [[ -n $TMUX ]]; then
-    # Si dans tmux, switch client
-    tmux switch-client -t $selected_name
+    tmux switch-client -t "$selected_name" 2>/dev/null || tmux attach -t "$selected_name"
 else
-    # Sinon, attache la session (depuis terminal normal)
-    tmux attach-session -t $selected_name
+    # Otherwise, attach from outside
+    tmux attach -t "$selected_name"
 fi
 
