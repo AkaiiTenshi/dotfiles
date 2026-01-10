@@ -1,0 +1,39 @@
+cat << 'EOF' > ~/.vimrc
+" --- CONFIG MINIMALE NOMADE (SANS CTAGS) ---
+set nocompatible
+set number
+set hidden
+set mouse=a
+set incsearch
+set ignorecase
+set smartcase
+
+" --- 1. NAVIGATION (Fuzzy-like) ---
+set path+=**
+set wildmenu
+set wildmode=longest,list,full
+set wildignore+=**/node_modules/**,**/dist/**,**/.git/**,**/target/**
+nnoremap ,f :find *
+
+" --- 2. GO TO DEFINITION (Remplacement Ctags par Grep) ---
+" Cherche le mot sous le curseur dans tout le projet
+nnoremap gd :grep! "\b<cword>\b" -R .<CR>:copen<CR>
+
+" --- 3. REFERENCES / USAGES ---
+nnoremap ,u :grep! <cword> -R .<CR>:copen<CR>
+
+" --- 4. EXPLORATEUR ---
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+nnoremap ,e :Lexplore<CR>
+
+" --- 5. NAVIGATION RECHERCHE ---
+" Permet de passer d'un résultat à l'autre rapidement après un gd ou ,u
+nnoremap [q :cprev<CR>
+nnoremap ]q :cnext<CR>
+
+" --- BONUS : AUTO-COMPLÉTATION ---
+filetype plugin indent on
+EOF
+
+echo "Config Vim installée avec succès dans ~/.vimrc"
