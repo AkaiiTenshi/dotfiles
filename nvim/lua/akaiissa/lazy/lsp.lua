@@ -32,7 +32,7 @@ return {
 				vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, { buffer = bufnr, desc = "Code action" })
 
 				-- Telescope LSP keymaps
-				vim.keymap.set("n", "gR", builtin.lsp_references, { buffer = 0} )
+				vim.keymap.set("n", "gR", builtin.lsp_references, { buffer = bufnr, desc = "Go to references" })
 				vim.keymap.set("n", "<space>wd", builtin.lsp_document_symbols, { buffer = bufnr, desc = "Document symbols" })
 				vim.keymap.set("n", "<space>ws", builtin.lsp_dynamic_workspace_symbols, { buffer = bufnr, desc = "Workspace symbols" })
 			end,
@@ -55,7 +55,10 @@ return {
 			ensure_installed = {
 				"clangd",
 				"pyright",
-				"lua_ls"
+				"lua_ls",
+				"ts_ls",
+				"eslint",
+				"tailwindcss"
 			},
 			handlers = {
 				function(server_name) -- default handler (optional)
@@ -68,7 +71,10 @@ return {
 						capabilities = capabilities,
 						root_dir = require("lspconfig").util.root_pattern(".git", "Makefile", "includes", "include", "compile_commands.json", ".clangd"),
 						cmd = {
-							"clangd", "--background-index", "--clang-tidy", "--header-insertion=never",
+							"clangd",
+							"--header-insertion=never",
+							"--background-index",
+							"--background-index-priority=low",
 						},
 					})
 				end,
@@ -96,7 +102,7 @@ return {
 						},
 					}
 				end,
-				pyright = function()
+				["pyright"] = function()
 					require("lspconfig").pyright.setup({
 						capabilities = capabilities,
 						settings = {
@@ -110,8 +116,82 @@ return {
 							},
 						},
 					})
-				end,}
-			})
+				end,
+				["ts_ls"] = function()
+					require("lspconfig").ts_ls.setup({
+						capabilities = capabilities,
+						settings = {
+							typescript = {
+								inlayHints = {
+									includeInlayParameterNameHints = 'all',
+									includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+									includeInlayFunctionParameterTypeHints = true,
+									includeInlayVariableTypeHints = true,
+									includeInlayPropertyDeclarationTypeHints = true,
+									includeInlayFunctionLikeReturnTypeHints = true,
+									includeInlayEnumMemberValueHints = true,
+								}
+							},
+							javascript = {
+								inlayHints = {
+									includeInlayParameterNameHints = 'all',
+									includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+									includeInlayFunctionParameterTypeHints = true,
+									includeInlayVariableTypeHints = true,
+									includeInlayPropertyDeclarationTypeHints = true,
+									includeInlayFunctionLikeReturnTypeHints = true,
+									includeInlayEnumMemberValueHints = true,
+								}
+							}
+						}
+					})
+				end,
+				["eslint"] = function()
+					require("lspconfig").eslint.setup({
+						capabilities = capabilities,
+						on_attach = function(client, bufnr)
+							-- Enable code actions on save if you want auto-fix
+							-- vim.api.nvim_create_autocmd("BufWritePre", {
+								--     buffer = bufnr,
+								--     command = "EslintFixAll",
+								-- })
+							end,
+							settings = {
+								workingDirectory = { mode = "auto" }
+							}
+						})
+				end,
+				["tailwindcss"] = function()
+					require("lspconfig").tailwindcss.setup({
+						capabilities = capabilities,
+						filetypes = {
+							"html",
+							"css",
+							"scss",
+							"javascript",
+							"javascriptreact",
+							"typescript",
+							"typescriptreact",
+							"vue",
+							"svelte"
+						},
+						settings = {
+							tailwindCSS = {
+								experimental = {
+									classRegex = {
+										-- Support for template literals
+										{ "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+										{ "cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
+										-- Standard className patterns
+										"class[:]\\s*?[\"'`]([^\"'`]*).*?",
+									},
+								},
+							},
+						},
+					})
+				end,
+			}
+		})
 
 			local cmp_select = { behavior = cmp.SelectBehavior.Select }
 			local luasnip = require('luasnip')
@@ -152,7 +232,7 @@ return {
 
 			vim.diagnostic.config({
 				-- update_in_insert = true,
-				virtual_lines = true,
+				virtual_text = true,
 				float = {
 					focusable = false,
 					style = "minimal",

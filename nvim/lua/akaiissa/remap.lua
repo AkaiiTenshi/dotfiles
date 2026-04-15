@@ -1,4 +1,10 @@
 vim.g.mapleader = " "
+
+-- Inline Hints
+vim.keymap.set('n', '<leader>ih', function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = "Toggle inlay hints" })
+
 -- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 -- bouger la ligne d'un cran vers le bas ou vers le haut
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")

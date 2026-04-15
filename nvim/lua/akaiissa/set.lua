@@ -1,4 +1,13 @@
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  pattern = "*",
+  command = "if mode() != 'c' | checktime | endif",
+})
+
 vim.opt.guicursor = ""
+
+vim.g.netrw_list_hide = [[^\.\(gitignore\)\@!.*]]
+vim.g.netrw_hide = 1
 
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -32,7 +41,7 @@ vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80"
 
-vim.g.c_formatter_42_set_equalprg = 1
+vim.g.c_formatter_42_set_equalprg = 0
 vim.g.c_formatter_42_format_on_save = 0
 vim.g.user42 = 'salsoysa'
 vim.g.mail42 = 'salsoysa@student.42.fr'
@@ -43,5 +52,11 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.wo.number = true         -- absolute line numbers
         vim.wo.relativenumber = true -- optional
     end,
+})
+-- Associate .tpp files with C++ filetype
+vim.filetype.add({
+  extension = {
+    tpp = 'cpp',
+  },
 })
 -- local augroup = vim.api.nvim_create_augroup
